@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 # This brings in a tool called Streamlit that helps us create a website/app interface without needing to know web design. Think of it like a template builder.
 
@@ -5,21 +6,24 @@ from datetime import datetime
 # This imports a tool that helps us work with dates and times (like getting today's date).
 
 from openai import OpenAI
-# This imports a tool that lets us connect to ChatGPT (OpenAI's AI service) so we can ask it questions.
+# This imports a tool that lets us connect to the AI service so we can ask it questions.
 
 from dotenv import load_dotenv
 # This imports a tool that reads secret information (like passwords/API keys) from a hidden file. It's like opening a safe to get your credentials.
 
-# Load OPENAI_API_KEY from .env
+# Load OPENROUTER_API_KEY from .env
 load_dotenv()
 # This line actually opens that safe and loads all the secret information into memory so we can use it.
 
-# Single OpenAI client + model
-client = OpenAI()
-# This creates a connection to the OpenAI service. Think of it like picking up a phone to call ChatGPT.
+# OpenRouter client — OpenAI-compatible, routes to 300+ models
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+)
+# This creates a connection to OpenRouter (which forwards requests to the AI model).
 
-MODEL = "gpt-4o-mini"
-# This specifies which version of ChatGPT we want to use. "gpt-4o-mini" is a fast and efficient version.
+MODEL = "openai/gpt-4.1-mini"
+# OpenRouter model ID: provider/model-name format.
 
 
 def analyze_product(product_name):
@@ -70,10 +74,13 @@ Keep it insightful and actionable.
     # End of the big prompt/instructions to ChatGPT
 
     response = client.chat.completions.create(
-        # This sends the instructions to ChatGPT and waits for an answer.
+        # This sends the instructions to the AI and waits for an answer.
         model=MODEL,
-        # Tell ChatGPT which version (gpt-4o-mini) to use.
-
+        extra_headers={
+            "HTTP-Referer": "",
+            "X-OpenRouter-Title": "Product Analysis Dashboard",
+        },
+        extra_body={},
         messages=[
             # Create a list of messages (the conversation)
             {"role": "system", "content": system_prompt},

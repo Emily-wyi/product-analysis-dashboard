@@ -11,19 +11,16 @@ from openai import OpenAI
 from dotenv import load_dotenv
 # This imports a tool that reads secret information (like passwords/API keys) from a hidden file. It's like opening a safe to get your credentials.
 
-# Load OPENROUTER_API_KEY from .env
+# Load OPENAI_API_KEY from .env
 load_dotenv()
 # This line actually opens that safe and loads all the secret information into memory so we can use it.
 
-# OpenRouter client — OpenAI-compatible, routes to 300+ models
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-)
-# This creates a connection to OpenRouter (which forwards requests to the AI model).
+# OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# This creates a connection to OpenAI using your API key from the environment.
 
-MODEL = "openai/gpt-4.1-mini"
-# OpenRouter model ID: provider/model-name format.
+MODEL = "gpt-4o-mini"
+# OpenAI model ID.
 
 
 def analyze_product(product_name):
@@ -76,11 +73,6 @@ Keep it insightful and actionable.
     response = client.chat.completions.create(
         # This sends the instructions to the AI and waits for an answer.
         model=MODEL,
-        extra_headers={
-            "HTTP-Referer": "",
-            "X-OpenRouter-Title": "Product Analysis Dashboard",
-        },
-        extra_body={},
         messages=[
             # Create a list of messages (the conversation)
             {"role": "system", "content": system_prompt},
